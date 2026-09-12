@@ -53,9 +53,15 @@ const listState = () =>
 
 const threshold = () => PASS_THRESHOLDS[Math.min(listState().pass, PASS_THRESHOLDS.length) - 1];
 
+// Dvi skirtingos sąvokos:
+//   atThreshold – pakanka teisingų iš eilės. Valdo DALIŲ atsidarymą (navigacija).
+//   isReady     – dar ir kitą dieną. Valdo juostą, ratus ir apdovanojimus (sąžiningumas).
+// Be šio skirtumo pirmą dieną neįmanoma pajudėti iš 1 dalies.
+function atThreshold(e) { return wordState(e).s >= threshold(); }
+
 function isReady(e) {
   const w = wordState(e);
-  return w.s >= threshold() && w.d.length >= MIN_DAYS;
+  return atThreshold(e) && w.d.length >= MIN_DAYS;
 }
 
 /* ---------- atsakymo tikrinimas / answer grading ---------- */
@@ -165,12 +171,12 @@ function renderHome() {
   const stageBox = $('home-stage');
   if (st.pass === 1) {
     const inStage = list.entries.filter(e => e.stage === st.stage);
-    const done    = inStage.filter(isReady).length;
+    const done    = inStage.filter(atThreshold).length;
     const maxStage = Math.max(...list.entries.map(e => e.stage));
     stageBox.style.display = '';
     stageBox.innerHTML =
       '<div class="row"><span>' + st.stage + ' dalis iš ' + maxStage + '</span>' +
-      '<span>' + done + ' / ' + inStage.length + '</span></div>' +
+      '<span>pramokta ' + done + ' / ' + inStage.length + '</span></div>' +
       '<div class="bar small"><div class="bar-fill" style="width:' +
       (done / inStage.length) * 100 + '%"></div></div>';
   } else {
@@ -357,7 +363,7 @@ function finishRound() {
     const maxStage = Math.max(...list.entries.map(e => e.stage));
     while (st.stage < maxStage) {
       const inStage = list.entries.filter(e => e.stage === st.stage);
-      if (inStage.filter(isReady).length / inStage.length >= STAGE_UNLOCK) {
+      if (inStage.filter(atThreshold).length / inStage.length >= STAGE_UNLOCK) {
         st.stage++; unlockedStage = true;
       } else break;
     }

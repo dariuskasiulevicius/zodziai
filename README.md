@@ -79,9 +79,17 @@ the phone silently fixes the kid's spelling and the app is worthless.
 ## Round composition
 
 75% current Stage, 25% review of earlier Stages and carried stragglers — both tunable per
-kid. Selection is weighted towards low Streak; order is shuffled. A Stage unlocks the next
-at 80% Ready, and its stragglers carry forward, so one stubborn word can never block
-progress. Later Passes ignore Stages and draw from the whole list.
+kid. Selection is weighted towards low Streak; order is shuffled. Later Passes ignore Stages
+and draw from the whole list.
+
+A Stage unlocks the next when **80% of its words have reached the Streak threshold** — note
+that this is *not* the same bar as Ready. Ready additionally requires a second day, and
+stages must be able to advance on the first evening or the child spends it on the same ten
+words. Stragglers carry forward, so one stubborn word can never block progress.
+
+This means the home screen shows two different numbers on purpose: the stage row counts words
+*pramokta* (at the streak bar) and the main bar counts words *išmokta* (Ready — survived to
+another day). The second is always the smaller, and it is the one that predicts the test.
 
 Multiple choice appears only for words at Streak 0 and never advances a Streak — it is a
 ramp onto typing, not an alternative to it.
