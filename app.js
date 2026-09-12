@@ -3,7 +3,6 @@
 /* ---------- taisyklės / rules ---------- */
 const PASS_THRESHOLDS = [3, 5, 7, 9, 11];   // Streak needed on pass 1..5
 const MIN_DAYS        = 2;                  // distinct days within the streak
-const STAGE_UNLOCK    = 0.8;                // 80% Ready unlocks next Stage
 const LEAD            = /^(the|a|an|to)\s+/i;
 
 const EMOJI = {
@@ -33,6 +32,7 @@ function loadProgress(kidId) {
   try { p = JSON.parse(localStorage.getItem(KEY(kidId))); } catch (e) { p = null; }
   if (!p || typeof p !== 'object') p = {};
   p.words    = p.words    || {};
+  p.tick     = p.tick     || 0;
   p.lists    = p.lists    || {};
   p.unlocked = p.unlocked || 0;
   return p;
@@ -114,45 +114,44 @@ function grade(raw, entry, others) {
 }
 
 /* ---------- raundo sudarymas / round building ---------- */
-function weight(e) {
-  if (isReady(e)) return 1;
-  return 5 - Math.min(wordState(e).s, 3);   // 0->5, 1->4, 2->3, 3+->2
-}
-
-function sampleWeighted(pool, n) {
-  const src = pool.slice(), out = [];
-  while (out.length < n && src.length) {
-    let total = 0;
-    for (const e of src) total += weight(e);
-    let r = Math.random() * total, i = 0;
-    for (; i < src.length; i++) { r -= weight(src[i]); if (r <= 0) break; }
-    out.push(src.splice(Math.min(i, src.length - 1), 1)[0]);
-  }
-  return out;
-}
-
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
+// Raundas renkamas eilėmis, ne dalimis:
+//   1. praeitą kartą suklysti žodžiai (bet ne daugiau kaip 70% raundo,
+//      kitaip nauji žodžiai niekada neprasibrautų),
+//   2. dar nematyti žodžiai – dalių tvarka, kad per dieną būtų pereita visa sąrašo,
+//   3. matyti, bet dar nepasiekę slenksčio – silpniausi ir seniausiai matyti pirma,
+//   4. jau pasiekę slenkstį – tik jei lieka vietos.
 function buildRound() {
-  const st = listState();
-  const n  = content.roundLength || 12;
+  const st  = listState();
+  const n   = content.roundLength || 12;
   const all = list.entries;
+  const th  = threshold();
 
-  let current, review;
-  if (st.pass === 1) {
-    current = all.filter(e => e.stage === st.stage);
-    review  = all.filter(e => e.stage < st.stage);
-  } else {
-    current = all;                 // vėlesni ratai ignoruoja dalis
-    review  = [];
-  }
+  const missed = new Set(st.missed || []);
+  const isMissed = e => missed.has(wordKey(e));
+  const age = e => wordState(e).t || 0;
 
-  let nReview = review.length ? Math.round(n * (content.reviewShare ?? 0.25)) : 0;
-  let nCurrent = Math.min(n - nReview, current.length);
-  nReview = Math.min(n - nCurrent, review.length);
+  const maxCarry = Math.max(1, Math.floor(n * 0.7));
+  const carry = all.filter(isMissed).sort((a, b) => age(a) - age(b)).slice(0, maxCarry);
 
-  const picked = sampleWeighted(current, nCurrent).concat(sampleWeighted(review, nReview));
-  return shuffle(picked);
+  const rest = all.filter(e => !carry.includes(e));
+
+  // Nauji žodžiai imami tik iš vienos – žemiausios dar nepradėtos – dalies,
+  // kad viename raunde neužgriūtų dvi dalys iš karto.
+  const unseen = rest.filter(e => !wordState(e).seen);
+  const nextStage = unseen.length ? Math.min(...unseen.map(e => e.stage)) : 0;
+  const fresh = unseen.filter(e => e.stage === nextStage);
+  const weak  = rest.filter(e => wordState(e).seen && wordState(e).s < th)
+                    .sort((a, b) => wordState(a).s - wordState(b).s || age(a) - age(b));
+  const done  = rest.filter(e => wordState(e).seen && wordState(e).s >= th)
+                    .sort((a, b) => age(a) - age(b));
+
+  const out = [];
+  for (const bucket of [carry, fresh, weak, done])
+    for (const e of bucket) { if (out.length >= n) break; out.push(e); }
+
+  return shuffle(out);
 }
 
 /* ---------- pradžios ekranas / home ---------- */
@@ -175,19 +174,19 @@ function renderHome() {
     : 'Patvirtinta kitą dieną: ' + ready + ' / ' + total;
 
   const stageBox = $('home-stage');
-  if (st.pass === 1) {
-    const inStage = list.entries.filter(e => e.stage === st.stage);
-    const done    = inStage.filter(atThreshold).length;
-    const maxStage = Math.max(...list.entries.map(e => e.stage));
-    stageBox.style.display = '';
-    stageBox.innerHTML =
-      '<div class="row"><span>' + st.stage + ' dalis iš ' + maxStage + '</span>' +
-      '<span>' + done + ' / ' + inStage.length + '</span></div>' +
-      '<div class="bar small"><div class="bar-fill" style="width:' +
-      (done / inStage.length) * 100 + '%"></div></div>';
-  } else {
-    stageBox.style.display = 'none';
-  }
+  const introduced = list.entries.filter(e => wordState(e).seen).length;
+  const nextNew    = list.entries.find(e => !wordState(e).seen);
+  const maxStage   = Math.max(...list.entries.map(e => e.stage));
+  const carryOver  = (st.missed || []).length;
+  stageBox.innerHTML =
+    '<div class="row"><span>Matyti žodžiai</span><span>' + introduced + ' / ' + total + '</span></div>' +
+    '<div class="bar small"><div class="bar-fill learn" style="width:' +
+      (introduced / total) * 100 + '%"></div></div>' +
+    '<div class="row" style="margin-top:10px">' +
+      (nextNew ? '<span>Nauji žodžiai iš ' + nextNew.stage + ' dalies (iš ' + maxStage + ')</span>'
+               : '<span>Visas sąrašas jau pradėtas</span>') +
+      (carryOver ? '<span>klaidos: ' + carryOver + '</span>' : '<span></span>') +
+    '</div>';
 
   const cd = $('home-countdown');
   if (list.testDate) {
@@ -273,6 +272,7 @@ function answerChoice(picked, entry, btn) {
   answered = true;
   const w = touchWord(entry);
   w.seen = true;                                  // pasirinkimas niekada nekelia streak
+  w.t = ++prog.tick;
   Array.from($('choice-block').children).forEach(b => b.disabled = true);
   btn.classList.add(picked === entry ? 'pick-ok' : 'pick-bad');
   feedback(picked === entry ? 'ok' : 'bad', entry, '', true);
@@ -290,6 +290,7 @@ function submitTyped(ev) {
   const res = grade(raw, entry, otherAnswers(entry));
   const w   = touchWord(entry);
   w.seen = true;
+  w.t = ++prog.tick;
 
   if (res.verdict === 'ok') {
     const before = isReady(entry);
@@ -363,41 +364,37 @@ function next() {
 /* ---------- pabaiga / summary ---------- */
 function finishRound() {
   const st = listState();
-  let unlockedStage = false, passedUp = false;
 
-  if (st.pass === 1) {
-    const maxStage = Math.max(...list.entries.map(e => e.stage));
-    while (st.stage < maxStage) {
-      const inStage = list.entries.filter(e => e.stage === st.stage);
-      if (inStage.filter(atThreshold).length / inStage.length >= STAGE_UNLOCK) {
-        st.stage++; unlockedStage = true;
-      } else break;
-    }
-  }
+  // klaidos keliauja į kitą raundą
+  st.missed = [...new Set(stats.weak.map(wordKey))];
+
   const learntPct = learnCount() / list.entries.length;
   let hit80 = false;
   if (learntPct >= 0.8 && st.milestone80 !== st.pass) { st.milestone80 = st.pass; hit80 = true; }
 
-  if (list.entries.every(isReady) && st.pass < PASS_THRESHOLDS.length) {
-    st.pass++; passedUp = true;
-  }
+  let passedUp = false;
+  if (list.entries.every(isReady) && st.pass < PASS_THRESHOLDS.length) { st.pass++; passedUp = true; }
   saveProgress();
 
   const set = EMOJI[content.collectionTheme] || EMOJI.creatures;
   const gained = set.slice(stats.unlockedBefore, prog.unlocked);
   const weak = [...new Set(stats.weak.map(e => e.en))].slice(0, 6);
+  const left = list.entries.filter(e => !wordState(e).seen).length;
 
   $('summary-title').textContent = 'Raundas baigtas';
   $('summary-body').innerHTML =
     '<div class="score">' + stats.correct + ' / ' + round.length + '</div>' +
     '<div class="line">Beveik: ' + stats.almost + ' · Neteisingai: ' + stats.wrong + '</div>' +
-    (stats.newReady.length ? '<div class="line">Nauji išmokti žodžiai: ' + stats.newReady.length + '</div>' : '') +
+    (stats.newReady.length ? '<div class="line">Nauji patvirtinti žodžiai: ' + stats.newReady.length + '</div>' : '') +
+    '<div class="line">' + (left
+        ? 'Dar nematyta žodžių: ' + left
+        : 'Visi sąrašo žodžiai jau matyti') + '</div>' +
     (gained.length ? '<div class="new-emoji">' + gained.join(' ') + '</div>' : '') +
-    (weak.length ? '<div class="weak">Dar sunku: ' + weak.map(w => '<b>' + esc(w) + '</b>').join(' ') + '</div>' : '') +
-    (unlockedStage ? '<div class="celebrate">Atsidarė ' + listState().stage + ' dalis!</div>' : '') +
+    (weak.length ? '<div class="weak">Į kitą raundą keliauja: ' +
+        weak.map(w => '<b>' + esc(w) + '</b>').join(' ') + '</div>' : '') +
     (hit80 ? '<div class="celebrate">Jau ' + Math.round(learntPct * 100) +
              '% žodžių išmokta! Rytoj juos pakartok — tada bus patvirtinta.</div>' : '') +
-    (passedUp ? '<div class="celebrate">Visas sąrašas išmoktas! Prasideda ' + listState().pass +
+    (passedUp ? '<div class="celebrate">Visas sąrašas patvirtintas! Prasideda ' + listState().pass +
                 ' ratas — dabar reikia ' + threshold() +
                 ' teisingų iš eilės. Ankstesnis ratas lieka užbaigtas.</div>' : '');
   show('summary');

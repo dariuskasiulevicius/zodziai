@@ -46,11 +46,10 @@ subset worth studying.
 _Avoid_: test (unqualified), exam
 
 **Stage**:
-A numbered group of about ten **Entries** within a **Word List**, worked through one at a
-time so that a ninety-word list has a visible next step. A **Stage** opens the next one when
-80% of its **Entries** have reached the current **Streak** threshold — deliberately *without*
-the second-day requirement that **Ready** carries, so that a child who practises well on the
-first evening is never stuck. Each **Stage** deliberately mixes
+A numbered group of about ten **Entries** within a **Word List**, setting the order in which
+new **Entries** enter practice. A **Stage** is not a gate: nothing has to be learned before
+the next one arrives. One **Practice Round** introduces the words of at most one **Stage**,
+so the whole **Word List** can be met in a single day. Each **Stage** deliberately mixes
 easy and hard **Entries** and is never grouped by meaning, because words of similar meaning
 interfere with each other when learned together. **Stages** are identified by number only.
 _Avoid_: chunk, group, level, batch, theme
@@ -100,12 +99,13 @@ separate from **Ready** so that hard work never inflates the readiness figure.
 
 - A **Word List** contains one or more **Entries**
 - An **Entry** belongs to exactly one **Word List**
-- A **Practice Round** rehearses **Entries** from exactly one **Word List** — mostly from the
-  current **Stage**, the rest reviewing earlier ones
+- A **Practice Round** rehearses **Entries** from exactly one **Word List**: the **Entries**
+  missed in the previous round first, then new ones from the next **Stage**, then the weakest
+  already seen
 - A **Word List** is learned in order to pass one **School Test**
 - A **Kid** has many **Word Lists**
-- A **Word List** is divided into **Stages** of about ten **Entries**, used only during the
-  first **Pass**
+- A **Word List** is divided into **Stages** of about ten **Entries**, which order the intake
+  of new **Entries** and have no effect after every **Entry** has been seen
 - An **Entry** belongs to exactly one **Stage**, assigned when authored and movable by the parent
 - A **School Test** samples 10–15 **Entries** from one **Word List**, unannounced
 - A **Word List** belongs to exactly one **Kid**; identical words for two **Kids** are
@@ -143,10 +143,11 @@ separate from **Ready** so that hard work never inflates the readiness figure.
   **Practice Round** never draws outside the chosen **Word List**. Words circulate between
   **Stages** within that list, and nowhere else. The child is asked to learn one list at a
   time, completely.
-- **Stage** progress and **Ready** were first treated as the same measure — resolved: they
-  are not. **Stages** are navigation and advance on **Streak** alone; **Ready** is the honest
-  measure and still requires a second day. Sharing one rule made the first evening
-  unwinnable: a child could answer perfectly for an hour and never leave the first **Stage**.
+- **Stages** were first built as gates that had to be cleared before the next opened —
+  resolved: they only order intake. Gating made the first evening unwinnable, and even once
+  fixed it kept the child on ten words while eighty went unseen. A **Practice Round** now
+  carries forward what was missed and tops up with the next **Stage**, so the whole list is
+  met on day one and **Ready** does the judging instead.
 - Accepting synonyms was considered and rejected — an **Entry** is a pair, and only its own
   **English Side** is correct. Two **Entries** sharing a **Lithuanian Side** is an authoring
   error, caught by validation and resolved with a **Note**.

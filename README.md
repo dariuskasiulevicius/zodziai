@@ -78,28 +78,18 @@ the phone silently fixes the kid's spelling and the app is worthless.
 
 ## Round composition
 
-75% current Stage, 25% review of earlier Stages and carried stragglers — both tunable per
-kid. Selection is weighted towards low Streak; order is shuffled. Later Passes ignore Stages
-and draw from the whole list.
+A round is filled from four queues in order, then shuffled:
 
-A Stage unlocks the next when **80% of its words have reached the Streak threshold** — note
-that this is *not* the same bar as Ready. Ready additionally requires a second day, and
-stages must be able to advance on the first evening or the child spends it on the same ten
-words. Stragglers carry forward, so one stubborn word can never block progress.
+1. **Words missed in the previous round** — capped at 70% of the round, so new words always
+   get in even when the child is struggling.
+2. **New words**, taken from the next Stage only — one Stage's intake per round at most.
+3. **Words already seen but below the Streak threshold** — weakest first, then least
+   recently seen.
+4. **Words at the threshold** — only if room is left.
 
-The home screen therefore shows one bar with two fills:
-
-- **blue — "Išmokta N / 91"** — words at the streak threshold. Moves today, can reach 100%
-  in a single day, and is what the child watches.
-- **green — "Patvirtinta kitą dieną"** — Ready. Cannot move until the next calendar day, and
-  is the number that predicts the School Test.
-
-Crossing 80% blue is celebrated once per Pass. A whole list can be taken to 100% blue in one
-sitting — about 380 answers at 16 words per round, so roughly an hour — but green stays at 0
-until tomorrow, and no emoji are paid until then.
-
-Multiple choice appears only for words at Streak 0 and never advances a Streak — it is a
-ramp onto typing, not an alternative to it.
+Stages are not gates. Nothing has to be learned before the next batch arrives; they only set
+the order in which words are introduced. The whole list is met on the first day — about 9
+rounds for 91 words — and Ready does the judging.
 
 ## Rewards
 
