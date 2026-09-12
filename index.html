@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12141c">
+<title>Žodžiai</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- Kas tu? -->
+  <section id="screen-kid" class="screen">
+    <h1 class="logo">Žodžiai</h1>
+    <p class="lead">Kas mokosi?</p>
+    <div id="kid-buttons" class="stack"></div>
+  </section>
+
+  <!-- Pradžia -->
+  <section id="screen-home" class="screen">
+    <header class="top">
+      <span id="home-kid" class="kid-chip"></span>
+      <button id="btn-switch-kid" class="link">keisti</button>
+    </header>
+
+    <h1 id="home-list" class="list-title"></h1>
+    <div id="home-pass" class="pass-badge"></div>
+
+    <div class="bar-block">
+      <div class="bar-label">
+        <span>Išmokta</span>
+        <span id="home-ready-count"></span>
+      </div>
+      <div class="bar"><div id="home-ready-fill" class="bar-fill"></div></div>
+    </div>
+
+    <div id="home-stage" class="stage-block"></div>
+    <div id="home-countdown" class="countdown"></div>
+
+    <button id="btn-practice" class="big-btn">Mokytis</button>
+
+    <div id="home-collection" class="collection-strip"></div>
+    <button id="btn-collection" class="link wide">Visa kolekcija</button>
+  </section>
+
+  <!-- Raundas -->
+  <section id="screen-round" class="screen">
+    <header class="top">
+      <button id="btn-quit" class="link">← Baigti</button>
+      <span id="round-counter" class="counter"></span>
+    </header>
+
+    <div class="prompt-block">
+      <div id="prompt-pos" class="pos"></div>
+      <div id="prompt-word" class="prompt-word"></div>
+      <div id="prompt-note" class="note"></div>
+    </div>
+
+    <form id="answer-form" autocomplete="off">
+      <div id="shape-hint" class="shape-hint"></div>
+      <input id="answer-input" type="text" inputmode="text"
+             autocomplete="off" autocorrect="off" autocapitalize="none"
+             spellcheck="false" placeholder="Rašyk angliškai">
+      <button id="btn-check" type="submit" class="big-btn">Tikrinti</button>
+    </form>
+
+    <div id="choice-block" class="choices"></div>
+
+    <div id="feedback" class="feedback"></div>
+    <button id="btn-next" class="big-btn ghost">Toliau</button>
+  </section>
+
+  <!-- Raundo pabaiga -->
+  <section id="screen-summary" class="screen">
+    <h1 id="summary-title" class="list-title"></h1>
+    <div id="summary-body" class="summary-body"></div>
+    <button id="btn-again" class="big-btn">Dar vienas raundas</button>
+    <button id="btn-home" class="link wide">Į pradžią</button>
+  </section>
+
+  <!-- Kolekcija -->
+  <section id="screen-collection" class="screen">
+    <header class="top">
+      <button id="btn-collection-back" class="link">← Atgal</button>
+    </header>
+    <h1 class="list-title">Kolekcija</h1>
+    <div id="collection-grid"></div>
+  </section>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

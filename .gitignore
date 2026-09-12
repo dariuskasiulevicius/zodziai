@@ -1,0 +1,10 @@
+.DS_Store
+
+# Mokyklos lapo nuotrauka – 1,5 MB ir asmeninė.
+# The photo of the school sheet: 1.5 MB, and personal. Left out on purpose —
+# once committed it stays in the history forever, and GitHub Pages repos are
+# usually public. Remove this line if you want it tracked.
+starter-unit.jpg
+
+# PhpStorm
+.idea/
