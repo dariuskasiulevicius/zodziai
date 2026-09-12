@@ -42,8 +42,13 @@ body{
 
 .bar-block{margin-bottom:18px}
 .bar-label{display:flex;justify-content:space-between;font-size:14px;color:var(--dim);margin-bottom:7px}
-.bar{height:12px;background:var(--card);border-radius:99px;overflow:hidden}
-.bar-fill{height:100%;width:0;background:var(--ok);border-radius:99px;transition:width .5s ease}
+.bar{height:14px;background:var(--card);border-radius:99px;overflow:hidden;position:relative}
+.bar-fill{position:absolute;left:0;top:0;height:100%;width:0;border-radius:99px;transition:width .5s ease}
+/* šviesi juosta – pramokta šiandien; ryški – patvirtinta kitą dieną */
+.bar-fill.learn{background:var(--brand)}
+.bar-fill.ready{background:var(--ok)}
+.bar-fill:not(.learn):not(.ready){background:var(--ok)}
+.bar-sub{margin-top:6px;font-size:13px;color:var(--dim)}
 .bar.small{height:8px}
 
 .stage-block{background:var(--card);border-radius:14px;padding:15px;margin-bottom:14px}

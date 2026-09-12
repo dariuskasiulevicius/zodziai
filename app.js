@@ -49,7 +49,7 @@ const touchWord = e => prog.words[wordKey(e)] ||
   (prog.words[wordKey(e)] = { s: 0, d: [], seen: false, r: 0 });
 
 const listState = () =>
-  prog.lists[list.id] || (prog.lists[list.id] = { pass: 1, stage: 1 });
+  prog.lists[list.id] || (prog.lists[list.id] = { pass: 1, stage: 1, milestone80: 0 });
 
 const threshold = () => PASS_THRESHOLDS[Math.min(listState().pass, PASS_THRESHOLDS.length) - 1];
 
@@ -157,6 +157,7 @@ function buildRound() {
 
 /* ---------- pradžios ekranas / home ---------- */
 function readyCount() { return list.entries.filter(isReady).length; }
+function learnCount() { return list.entries.filter(atThreshold).length; }
 
 function renderHome() {
   const st = listState(), total = list.entries.length, ready = readyCount();
@@ -165,8 +166,13 @@ function renderHome() {
   $('home-list').textContent = list.name;
   $('home-pass').textContent = st.pass + ' ratas · reikia ' + threshold() + ' teisingų iš eilės';
 
-  $('home-ready-count').textContent = ready + ' / ' + total;
+  const learnt = learnCount();
+  $('home-learn-count').textContent = learnt + ' / ' + total;
+  $('home-learn-fill').style.width  = (total ? (learnt / total) * 100 : 0) + '%';
   $('home-ready-fill').style.width  = (total ? (ready / total) * 100 : 0) + '%';
+  $('home-ready-count').textContent = ready === total
+    ? 'Viskas patvirtinta kitą dieną ✓'
+    : 'Patvirtinta kitą dieną: ' + ready + ' / ' + total;
 
   const stageBox = $('home-stage');
   if (st.pass === 1) {
@@ -176,7 +182,7 @@ function renderHome() {
     stageBox.style.display = '';
     stageBox.innerHTML =
       '<div class="row"><span>' + st.stage + ' dalis iš ' + maxStage + '</span>' +
-      '<span>pramokta ' + done + ' / ' + inStage.length + '</span></div>' +
+      '<span>' + done + ' / ' + inStage.length + '</span></div>' +
       '<div class="bar small"><div class="bar-fill" style="width:' +
       (done / inStage.length) * 100 + '%"></div></div>';
   } else {
@@ -368,6 +374,10 @@ function finishRound() {
       } else break;
     }
   }
+  const learntPct = learnCount() / list.entries.length;
+  let hit80 = false;
+  if (learntPct >= 0.8 && st.milestone80 !== st.pass) { st.milestone80 = st.pass; hit80 = true; }
+
   if (list.entries.every(isReady) && st.pass < PASS_THRESHOLDS.length) {
     st.pass++; passedUp = true;
   }
@@ -385,6 +395,8 @@ function finishRound() {
     (gained.length ? '<div class="new-emoji">' + gained.join(' ') + '</div>' : '') +
     (weak.length ? '<div class="weak">Dar sunku: ' + weak.map(w => '<b>' + esc(w) + '</b>').join(' ') + '</div>' : '') +
     (unlockedStage ? '<div class="celebrate">Atsidarė ' + listState().stage + ' dalis!</div>' : '') +
+    (hit80 ? '<div class="celebrate">Jau ' + Math.round(learntPct * 100) +
+             '% žodžių išmokta! Rytoj juos pakartok — tada bus patvirtinta.</div>' : '') +
     (passedUp ? '<div class="celebrate">Visas sąrašas išmoktas! Prasideda ' + listState().pass +
                 ' ratas — dabar reikia ' + threshold() +
                 ' teisingų iš eilės. Ankstesnis ratas lieka užbaigtas.</div>' : '');

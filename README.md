@@ -87,9 +87,16 @@ that this is *not* the same bar as Ready. Ready additionally requires a second d
 stages must be able to advance on the first evening or the child spends it on the same ten
 words. Stragglers carry forward, so one stubborn word can never block progress.
 
-This means the home screen shows two different numbers on purpose: the stage row counts words
-*pramokta* (at the streak bar) and the main bar counts words *išmokta* (Ready — survived to
-another day). The second is always the smaller, and it is the one that predicts the test.
+The home screen therefore shows one bar with two fills:
+
+- **blue — "Išmokta N / 91"** — words at the streak threshold. Moves today, can reach 100%
+  in a single day, and is what the child watches.
+- **green — "Patvirtinta kitą dieną"** — Ready. Cannot move until the next calendar day, and
+  is the number that predicts the School Test.
+
+Crossing 80% blue is celebrated once per Pass. A whole list can be taken to 100% blue in one
+sitting — about 380 answers at 16 words per round, so roughly an hour — but green stays at 0
+until tomorrow, and no emoji are paid until then.
 
 Multiple choice appears only for words at Streak 0 and never advances a Streak — it is a
 ramp onto typing, not an alternative to it.
