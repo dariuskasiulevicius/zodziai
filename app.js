@@ -264,7 +264,8 @@ function showQuestion() {
   }
 }
 
-const POS = { n: 'daiktavardis', v: 'veiksmažodis', adj: 'būdvardis', adv: 'prieveiksmis', prep: 'prielinksnis' };
+const POS = { n: 'daiktavardis', v: 'veiksmažodis', adj: 'būdvardis',
+              adv: 'prieveiksmis', prep: 'prielinksnis', det: 'įvardis' };
 const posLabel = p => POS[p] || p;
 
 function answerChoice(picked, entry, btn) {
